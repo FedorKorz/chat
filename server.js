@@ -1,33 +1,47 @@
 const io = require('socket.io')();
-let usersInRoom = 0;
 const port = 8000;
 
-let rooms = {
-  room1 : {
-    full: false,
-    usersImCounter: 0
-  }
-}
+let rooms = [];
+let connections = 0;
 
 io.on('connection', (socket) => { 
 
-  socket.on('passDataToServer', (a) => { 
-    console.log(a);
+  ++connections;
+
+  socket.on('passDataToServer', (a) => {
+      rooms[rooms.length-1].gestures.push(a);
   });
 
   socket.on('create', (room) => {
-    usersInRoom++;
+    if (rooms.length === 0) {
+      rooms.push(room);
+      console.log(connections);
+      console.log(rooms);
+      return;
+    }
+    if (!rooms[rooms.length-1].full && connections % 2 === 0) {
+      rooms[rooms.length-1].full = true;
+      console.log(connections);
+      console.log(rooms);
+      return;
+    } 
+    if (rooms[rooms.length-1].full && connections % 2 !== 0) {
+      room.name = `room_${rooms.length}`;
+      rooms.push(room);
+      console.log(connections);
+      console.log(rooms);
+      return;
+    };  
+  });
 
-    if (usersInRoom > 2) {
-      console.log('комната переполнена');
-      return;  
-    };
-
-    socket.join(room);
-    console.log(usersInRoom);
+  socket.on('grabDataFromServer', () => {
+    console.log(rooms[Math.floor(connections / 2)].gestures);
+    socket.emit('grab', rooms[0].gestures);
   });
 
 });
 
 io.listen(port);
 console.log('listening on port ', port);
+
+// io.to('some room').emit('some event');

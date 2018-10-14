@@ -1,10 +1,11 @@
-import { passDataToServer, creatingRoom } from './api';
+import { passDataToServer, creatingRoom, grabDataFromServer } from './api';
 import React, { Component } from 'react';
 
 class App extends Component {
 
   state = {
     selectedGesture: null
+
   };
 
   gestureClicked(gest) {
@@ -14,6 +15,12 @@ class App extends Component {
 
   createRoom() {
     creatingRoom();
+  }
+
+  grabDataFromServer() {
+    grabDataFromServer(
+      (err, dataFromServer) => { this.setState({ selectedGesture: dataFromServer }); }
+    )
   }
 
   render() {
@@ -34,6 +41,7 @@ class App extends Component {
           </ul>
         </div>
         <button onClick = { this.createRoom }>Create room</button>
+        <button onClick = { () => this.grabDataFromServer() }>Grab data</button>
       </div>
     );
   }
