@@ -1,16 +1,22 @@
-import { passDataToServer, creatingRoom, grabDataFromServer } from './api';
+import { passDataToServer, creatingRoom, grabDataFromServer, startGame } from './api';
 import React, { Component } from 'react';
 
 class App extends Component {
 
   state = {
-    selectedGesture: null
-
+    selectedGesture: null,
+    numOfRoom: 0,
+    gameStarted: false,
+    playersConnected: null
   };
 
   gestureClicked(gest) {
     this.setState({selectedGesture: gest});
     passDataToServer(gest);
+  }
+
+  test() {
+    console.log(this.state);
   }
 
   createRoom() {
@@ -19,18 +25,28 @@ class App extends Component {
 
   grabDataFromServer() {
     grabDataFromServer(
-      (err, dataFromServer) => { this.setState({ selectedGesture: dataFromServer }); }
+      (err, dataFromServer, numOfRoom) => { 
+        this.setState({ 
+          selectedGesture: dataFromServer.gestures,
+          numOfRoom: numOfRoom,
+          gameStarted: dataFromServer.full,
+          playersConnected: dataFromServer.playersConnected       
+        }); 
+      }
     )
   }
 
   render() {
     return (
       <div className="App">
+        <div>Session # { this.state.numOfRoom }</div>
+        <div>Game stated</div>
         <div className="currentGesture">
           <h2>
             { this.state.selectedGesture }
           </h2>
         </div>
+        <button onClick={ () => this.test() }>Start game</button>
         <div className="available-gestures">
           <ul>
             <li onClick = { () => this.gestureClicked('rock') }>rock</li>

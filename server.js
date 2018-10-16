@@ -13,6 +13,10 @@ io.on('connection', (socket) => {
   });
 
   socket.on('create', (room) => {
+
+    socket.join(room);
+    ++room.playersConnected;
+    
     if (rooms.length === 0) {
       rooms.push(room);
       console.log(connections);
@@ -34,9 +38,10 @@ io.on('connection', (socket) => {
     };  
   });
 
+
+
   socket.on('grabDataFromServer', () => {
-    console.log(rooms[Math.floor(connections / 2)].gestures);
-    socket.emit('grab', rooms[0].gestures);
+    socket.emit('grab', rooms, rooms.length);
   });
 
 });
